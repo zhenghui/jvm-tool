@@ -14,6 +14,12 @@ import java.io.IOException;
  */
 public class ClassLoader {
 
+    /**
+     * load class 生成对应的16进制的字符串
+     * @param filePath
+     * @return
+     * @throws Exception
+     */
     public String loadClass(String filePath) throws Exception {
         FileInputStream fileInputStream = null;
         fileInputStream = new FileInputStream(filePath);
