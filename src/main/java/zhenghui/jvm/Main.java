@@ -1,4 +1,4 @@
-package zhenghui.jvm.main;
+package zhenghui.jvm;
 
 /**
  *

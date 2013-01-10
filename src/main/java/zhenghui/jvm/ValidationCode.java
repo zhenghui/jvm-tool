@@ -1,4 +1,4 @@
-package zhenghui.jvm.validate;
+package zhenghui.jvm;
 
 /**
  * Created by IntelliJ IDEA.

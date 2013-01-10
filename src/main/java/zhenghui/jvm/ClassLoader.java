@@ -1,9 +1,7 @@
-package zhenghui.jvm.load;
+package zhenghui.jvm;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileReader;
-import java.io.IOException;
 
 /**
  * Created by IntelliJ IDEA.
@@ -16,24 +14,27 @@ public class ClassLoader {
 
     /**
      * load class 生成对应的16进制的字符串
+     *
      * @param filePath
      * @return
      * @throws Exception
      */
     public String loadClass(String filePath) throws Exception {
-        FileInputStream fileInputStream = null;
-        fileInputStream = new FileInputStream(filePath);
+        File file = new File(filePath);
+        if(!file.exists()){
+            return null;
+        }
+        FileInputStream fileInputStream = new FileInputStream(filePath);
         int i;
         StringBuilder sb = new StringBuilder();
         while ((i = fileInputStream.read()) != -1) {
-            sb.append(Integer.toHexString(i));
+            sb.append(String.format("%02X", i));
         }
-
         fileInputStream.close();
         return sb.toString();
     }
 
-    public static void main(String[] args) throws Exception{
+    public static void main(String[] args) throws Exception {
         ClassLoader cl = new ClassLoader();
         System.out.println(cl.loadClass("d:\\Test.class"));
     }
