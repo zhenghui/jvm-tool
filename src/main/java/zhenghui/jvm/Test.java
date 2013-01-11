@@ -9,7 +9,7 @@ package zhenghui.jvm;
  */
 public class Test {
     
-    private int a = 0;
+    private int a = 20  ;
     
     public int add(int a,int b){
         return a + b;
