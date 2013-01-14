@@ -1,4 +1,9 @@
-package zhenghui.jvm;
+package zhenghui.jvm.parse;
+
+import zhenghui.jvm.ConstantPoolResult;
+import zhenghui.jvm.Util;
+
+import static zhenghui.jvm.CommonConstant.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -13,13 +18,6 @@ package zhenghui.jvm;
  * CONSTANT_InvokeDynamic CONSTANT_MethodHandle CONSTANT_MethodType 常量解析除外
  */
 public class ConstantPoolParse {
-
-    /**
-     * 一个字节需要两位表示
-     */
-    private static final int TWO = 2;
-    
-    private static final String BLANK = "     ";
 
     public static final int CONSTANT_Utf8 = 1;
     public static final int CONSTANT_Integer = 3;
@@ -43,28 +41,7 @@ public class ConstantPoolParse {
     }
 
 
-    /**
-     * 解析基础信息,包括类名,魔数和版本号
-     *
-     * @return
-     */
-    public String[] pareBaseInfo() {
-        String[] strs = new String[4];
-        //todo 需要加上类名
-        strs[0] = "source file : xxx";
-        //前4个字节是魔数
-        Type magic_num = new Type(code.substring(0 * TWO, 4 * TWO));
-        strs[1] = "magic num : " + magic_num.getValue();
-        //minnor 版本
-        Type minor_version = new Type(code.substring(4 * TWO, 6 * TWO));
-        strs[2] = "minor version : " + minor_version.getValue();
-        //major版本
-        Type major_version = new Type(code.substring(6 * TWO, 8 * TWO));
-        strs[3] = "major version : " + major_version.getValue();
-        return strs;
-    }
-
-    public String[] pareContantPool() throws Exception {
+    public ConstantPoolResult pareContantPool() throws Exception {
         //常量池容量计数器.注意,真实的计数是count-1个.因为这个count包括了计数为0的常量
         Type constant_pool_count = new Type(code.substring(8 * TWO, 10 * TWO));
         String[] strs = new String[constant_pool_count.getDecimalInteger()];
@@ -196,68 +173,10 @@ public class ConstantPoolParse {
                     ;
             }
         }
-        return strs;
-    }
-
-    /**
-     * 表示无符号数.类似在jvm specs里规定的u1,u2,u4,u8
-     */
-    class Type {
-
-        /**
-         * 对应的16进制表示值
-         */
-        private String value;
-
-        Type(String value) {
-            this.value = value;
-        }
-
-        /**
-         * 转换成十进制Integer
-         *
-         * @return
-         */
-        public int getDecimalInteger() {
-            return Integer.parseInt(value, 16);
-        }
-
-        /**
-         * 转换成十进制Float
-         *
-         * @return
-         */
-        public float getDecimalFloat(){
-            return Float.intBitsToFloat(getDecimalInteger());
-        }
-
-        /**
-         * 转换成十进制Long
-         *
-         * @return
-         */
-        public long getDecimalLong(){
-            return Long.parseLong(value,16);
-        }
-
-        /**
-         * 转换成十进制Long
-         *
-         * @return
-         */
-        public double getDecimalDouble(){
-            return Double.longBitsToDouble(getDecimalLong());
-        }
-        
-        /**
-         * 获取对应的16进制表示值
-         *
-         * @return
-         */
-        public String getValue() {
-            return value;
-        }
-
+        ConstantPoolResult result = new ConstantPoolResult();
+        result.setStrs(strs);
+        result.setHandle(hand);
+        return result;
     }
 
     /**
