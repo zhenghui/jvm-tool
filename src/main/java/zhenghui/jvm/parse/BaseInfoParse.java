@@ -103,6 +103,6 @@ public class BaseInfoParse {
      * @return
      */
     private boolean hasTag(int flag,int tag){
-        return (flag * tag) == tag;
+        return (flag & tag) == tag;
     }
 }
