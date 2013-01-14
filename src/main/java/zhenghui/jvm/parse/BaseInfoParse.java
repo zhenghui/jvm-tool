@@ -7,7 +7,7 @@ import static zhenghui.jvm.CommonConstant.TWO;
  * User: zhenghui
  * Date: 13-1-14
  * Time: 下午4:45
- * To change this template use File | Settings | File Templates.
+ * 一些基本信息的解析
  */
 public class BaseInfoParse {
 

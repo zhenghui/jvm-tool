@@ -260,7 +260,7 @@ public class ConstantPoolParse {
 
         @Override
         public String getValue() throws Exception {
-            return "int-value:" + bytes.getDecimalInteger();
+            return "int value:" + bytes.getDecimalInteger();
         }
 
         @Override
@@ -290,7 +290,7 @@ public class ConstantPoolParse {
 
         @Override
         public String getValue() throws Exception {
-            return "float-value:" + bytes.getDecimalFloat();
+            return "float value:" + bytes.getDecimalFloat();
         }
 
         @Override
@@ -320,7 +320,7 @@ public class ConstantPoolParse {
 
         @Override
         public String getValue() throws Exception {
-            return "long-value:" + bytes.getDecimalLong();
+            return "long value:" + bytes.getDecimalLong();
         }
 
         @Override
@@ -350,7 +350,7 @@ public class ConstantPoolParse {
 
         @Override
         public String getValue() throws Exception {
-            return "double-value:" + bytes.getDecimalDouble();
+            return "double value:" + bytes.getDecimalDouble();
         }
 
         @Override
