@@ -1,6 +1,5 @@
 package zhenghui.jvm.parse;
 
-import zhenghui.jvm.ConstantPoolResult;
 import zhenghui.jvm.Util;
 
 import static zhenghui.jvm.CommonConstant.*;
@@ -41,7 +40,7 @@ public class ConstantPoolParse {
     }
 
 
-    public ConstantPoolResult pareContantPool() throws Exception {
+    public ParseResult pareContantPool() throws Exception {
         //常量池容量计数器.注意,真实的计数是count-1个.因为这个count包括了计数为0的常量
         Type constant_pool_count = new Type(code.substring(8 * TWO, 10 * TWO));
         String[] strs = new String[constant_pool_count.getDecimalInteger()];
@@ -173,7 +172,7 @@ public class ConstantPoolParse {
                     ;
             }
         }
-        ConstantPoolResult result = new ConstantPoolResult();
+        ParseResult result = new ParseResult();
         result.setStrs(strs);
         result.setHandle(hand);
         return result;

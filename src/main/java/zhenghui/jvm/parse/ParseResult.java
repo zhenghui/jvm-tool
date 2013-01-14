@@ -1,4 +1,4 @@
-package zhenghui.jvm;
+package zhenghui.jvm.parse;
 
 /**
  * Created by IntelliJ IDEA.
@@ -7,7 +7,7 @@ package zhenghui.jvm;
  * Time: обнГ4:15
  * 
  */
-public class ConstantPoolResult {
+public class ParseResult {
 
     public String[] getStrs() {
         return strs;

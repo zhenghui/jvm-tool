@@ -2,6 +2,7 @@ package zhenghui.jvm;
 
 import zhenghui.jvm.parse.BaseInfoParse;
 import zhenghui.jvm.parse.ConstantPoolParse;
+import zhenghui.jvm.parse.ParseResult;
 
 /**
  *
@@ -16,14 +17,17 @@ public class Main {
         ClassLoader cl = new ClassLoader();
         String code = cl.loadClass("d:\\Test.class");
         BaseInfoParse baseInfoParse = new BaseInfoParse(code);
-        for(String str : baseInfoParse.pareBaseInfo()){
+        for(String str : baseInfoParse.parseBaseInfo()){
             System.out.println(str);
         }
         ConstantPoolParse constantPoolParse = new ConstantPoolParse(code);
-        ConstantPoolResult result = constantPoolParse.pareContantPool();
+        ParseResult result = constantPoolParse.pareContantPool();
         for(String str : result.getStrs()){
             System.out.println(str);
         }
-        System.out.println(result.getHandle()/2);
+        result = baseInfoParse.parseAccessFlags(result.getHandle());
+        for(String str : result.getStrs()){
+            System.out.println(str);
+        }
     }
 }
