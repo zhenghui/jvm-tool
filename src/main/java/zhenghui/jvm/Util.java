@@ -24,6 +24,16 @@ public class Util {
         return new String(baKeyword, "utf-8");
     }
 
+    /**
+     * 传入的flag中是否有对应的tag
+     * @param flag
+     * @param tag
+     * @return
+     */
+    public static boolean hasTag(int flag,int tag){
+        return (flag & tag) == tag;
+    }
+
     public static void main(String [] args) throws Exception{
        System.out.println(Util.toStringHex("546573742E6A617661"));
     }

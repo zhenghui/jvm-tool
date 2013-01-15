@@ -1,5 +1,7 @@
 package zhenghui.jvm.parse;
 
+import zhenghui.jvm.Util;
+
 import static zhenghui.jvm.CommonConstant.*;
 
 /**
@@ -106,43 +108,34 @@ public class BaseInfoParse {
 
     private String getAccessFlags(int access_flag){
         String flags = "";
-        if(hasTag(access_flag,ACC_PUBLIC)){
+        if(Util.hasTag(access_flag, ACC_PUBLIC)){
             flags += " ACC_PUBLIC,";
         }
-        if(hasTag(access_flag,ACC_FINAL)){
+        if(Util.hasTag(access_flag,ACC_FINAL)){
             flags += " ACC_FINAL,";
         }
-        if(hasTag(access_flag,ACC_SUPER)){
+        if(Util.hasTag(access_flag,ACC_SUPER)){
             flags += " ACC_SUPER,";
         }
-        if(hasTag(access_flag,ACC_INTERFACE)){
+        if(Util.hasTag(access_flag,ACC_INTERFACE)){
             flags += " ACC_INTERFACE,";
         }
-        if(hasTag(access_flag,ACC_ABSTRACT)){
+        if(Util.hasTag(access_flag,ACC_ABSTRACT)){
             flags += " ACC_ABSTRACT,";
         }
-        if(hasTag(access_flag,ACC_SYNTHETIC)){
+        if(Util.hasTag(access_flag,ACC_SYNTHETIC)){
             flags += " ACC_SYNTHETIC,";
         }
-        if(hasTag(access_flag,ACC_ANNOTATION)){
+        if(Util.hasTag(access_flag,ACC_ANNOTATION)){
             flags += " ACC_ANNOTATION,";
         }
-        if(hasTag(access_flag,ACC_ENUM)){
+        if(Util.hasTag(access_flag,ACC_ENUM)){
             flags += " ACC_ENUM,";
         }
-        if(hasTag(access_flag,ACC_MODULE)){
+        if(Util.hasTag(access_flag,ACC_MODULE)){
             flags += " ACC_MODULE,";
         }
         return flags.substring(0,flags.length() -1);
     }
 
-    /**
-     * 传入的flag中是否有对应的tag
-     * @param flag
-     * @param tag
-     * @return
-     */
-    private boolean hasTag(int flag,int tag){
-        return (flag & tag) == tag;
-    }
 }
