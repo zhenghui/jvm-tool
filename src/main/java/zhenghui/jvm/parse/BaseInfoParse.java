@@ -1,5 +1,6 @@
 package zhenghui.jvm.parse;
 
+import static zhenghui.jvm.CommonConstant.BLANK;
 import static zhenghui.jvm.CommonConstant.TWO;
 
 /**
@@ -51,6 +52,11 @@ public class BaseInfoParse {
         return strs;
     }
 
+    /**
+     * 解析access_flags
+     * @param hand
+     * @return
+     */
     public ParseResult parseAccessFlags(int hand){
         ParseResult result = new ParseResult();
         int access_flag_end = hand + 2 * TWO;
@@ -61,6 +67,51 @@ public class BaseInfoParse {
         //访问标记在常量池后面,占用两个字节.
         result.setHandle(access_flag_end);
         result.setStrs(strs);
+        return result;
+    }
+
+    /**
+     * 解析 this_class super_class,interfaces
+     * @param hand
+     * @return
+     */
+    public ParseResult parseClassInfo(int hand){
+        ParseResult result = new ParseResult();
+        //this_class 占两个字节
+        int this_class_end = hand + 2 * TWO;
+        Type this_class = new Type(code.substring(hand,this_class_end));
+        //super_class 占用两个字节
+        int super_class_end = this_class_end + 2 * TWO;
+        Type super_class = new Type(code.substring(this_class_end,super_class_end));
+        //接口计数器占用两个字节
+        int interface_count_end = super_class_end + 2 * TWO;
+        Type interfaces_couont = new Type(code.substring(super_class_end,interface_count_end));
+        //接口数组
+        Type[] interfaces = null;
+        //当前的位置
+        int current = interface_count_end;
+        //每个接口索引占用两个字节
+        if(interfaces_couont.getDecimalInteger() > 0){
+            interfaces = new Type[interfaces_couont.getDecimalInteger()];
+            for(int i = 0; i < interfaces_couont.getDecimalInteger(); i ++){
+                int end = current + 2* TWO;
+                interfaces[i] = new Type(code.substring(current, end));
+                current = end;
+            }
+        }
+        //this_class 与 super_class写到一行. .interfaces所有写到一行
+        String[] strs = new String[2];
+        strs[0] = "this_class  index:#" + this_class.getDecimalInteger() + BLANK + "super_class index:#" + super_class.getDecimalInteger();
+        String interface_msg = "interface_count:" + interfaces_couont.getDecimalInteger()+BLANK;
+        if(interfaces != null){
+            for(Type inter : interfaces){
+                interface_msg += "#" + inter.getDecimalInteger()+",";
+            }
+            interface_msg = interface_msg.substring(0,interface_msg.length() -1);
+        }
+        strs[1] = interface_msg;
+        result.setStrs(strs);
+        result.setHandle(current);
         return result;
     }
 

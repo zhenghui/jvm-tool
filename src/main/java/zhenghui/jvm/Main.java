@@ -32,5 +32,9 @@ public class Main {
         for(String str : result.getStrs()){
             System.out.println(str);
         }
+        result = baseInfoParse.parseClassInfo(result.getHandle());
+        for(String str : result.getStrs()){
+            System.out.println(str);
+        }
     }
 }
