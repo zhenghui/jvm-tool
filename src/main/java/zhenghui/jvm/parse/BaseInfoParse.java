@@ -106,6 +106,29 @@ public class BaseInfoParse {
         return result;
     }
 
+    /**
+     * parse field info
+     * @param hand
+     * @return
+     */
+    public ParseResult parseFieldInfo(int hand){
+        ParseResult result = new ParseResult();
+
+        //field count 占用两个字节
+        int field_count_end = hand + 2 * TWO;
+        Type field_count = new Type(code.substring(hand,field_count_end));
+        //字段表数组
+        Type[] fields = null;
+        if(field_count.getDecimalInteger() > 0){
+            fields = new Type[field_count.getDecimalInteger()];
+            for(int i = 0; i < field_count.getDecimalInteger(); i ++){
+
+            }
+        }
+
+        return result;
+    }
+
     private String getAccessFlags(int access_flag){
         String flags = "";
         if(Util.hasTag(access_flag, ACC_PUBLIC)){
