@@ -1,7 +1,6 @@
 package zhenghui.jvm.parse;
 
-import static zhenghui.jvm.CommonConstant.BLANK;
-import static zhenghui.jvm.CommonConstant.TWO;
+import static zhenghui.jvm.CommonConstant.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -11,16 +10,6 @@ import static zhenghui.jvm.CommonConstant.TWO;
  * 一些基本信息的解析
  */
 public class BaseInfoParse {
-
-    public static final int ACC_PUBLIC        = 0x0001; // class, inner, field, method
-    public static final int ACC_FINAL         = 0x0010; // class, inner, field, method
-    public static final int ACC_SUPER         = 0x0020; // class
-    public static final int ACC_INTERFACE     = 0x0200; // class, inner
-    public static final int ACC_ABSTRACT      = 0x0400; // class, inner,        method
-    public static final int ACC_SYNTHETIC     = 0x1000; // class, inner, field, method
-    public static final int ACC_ANNOTATION    = 0x2000; // class, inner
-    public static final int ACC_ENUM          = 0x4000; // class, inner, field
-    public static final int ACC_MODULE        = 0x8000; // class, inner, field, method
 
     /**
      * class的十六进制字节码
