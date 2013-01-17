@@ -44,6 +44,6 @@ public class Main {
         for(String str : result.getStrs()){
             System.out.println(str);
         }
-//        System.out.println(result.getHandle());
+        System.out.println(result.getHandle()/2);
     }
 }

@@ -2,6 +2,9 @@ package zhenghui.jvm.parse;
 
 import zhenghui.jvm.Util;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static zhenghui.jvm.CommonConstant.*;
 
 /**
@@ -31,18 +34,16 @@ public class BaseInfoParse {
      * @return
      */
     public String[] parseBaseInfo() {
-        String[] strs = new String[4];
-        //todo 需要加上类名
-        strs[0] = "source file : xxx";
+        String[] strs = new String[3];
         //前4个字节是魔数
         Type magic_num = new Type(code.substring(0 * TWO, 4 * TWO));
-        strs[1] = "magic num : " + magic_num.getValue();
+        strs[0] = "magic num : " + magic_num.getValue();
         //minnor 版本
         Type minor_version = new Type(code.substring(4 * TWO, 6 * TWO));
-        strs[2] = "minor version : " + minor_version.getValue();
+        strs[1] = "minor version : " + minor_version.getValue();
         //major版本
         Type major_version = new Type(code.substring(6 * TWO, 8 * TWO));
-        strs[3] = "major version : " + major_version.getValue();
+        strs[2] = "major version : " + major_version.getValue();
         return strs;
     }
 
@@ -122,7 +123,6 @@ public class BaseInfoParse {
         //field count 占用两个字节
         int field_count_end = hand + 2 * TWO;
         Type field_count = new Type(code.substring(hand, field_count_end));
-        //字段表数组
         String[] strs = null;
         int current = field_count_end;
         if (field_count.getDecimalInteger() > 0) {
@@ -149,8 +149,34 @@ public class BaseInfoParse {
                 current = attributeResult.getHandle();
             }
         }
+        if(strs == null || strs.length<= 0){
+            strs = new String[1];
+            strs[0] = "this class has no field";
+        }
         result.setStrs(strs);
         result.setHandle(current);
+        return result;
+    }
+
+    /**
+     * parse method info
+     *
+     * @param hand
+     * @return
+     */
+    public ParseResult parseMethodInfo(int hand) {
+        ParseResult result = new ParseResult();
+        int method_count_end = hand + 2 * TWO;
+        Type method_count = new Type(code.substring(hand,method_count_end));
+        List<String> strList = new ArrayList<>();
+        int current = method_count_end;
+        if(method_count.getDecimalInteger() > 0){
+
+        } else {
+            strList.add("this class has no method");
+        }
+        result.setHandle(current);
+        result.setStrs((String[]) strList.toArray());
         return result;
     }
 
