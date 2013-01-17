@@ -2,6 +2,9 @@ package zhenghui.jvm.parse;
 
 import zhenghui.jvm.Util;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static zhenghui.jvm.CommonConstant.*;
 
 /**
@@ -13,7 +16,7 @@ import static zhenghui.jvm.CommonConstant.*;
  * jvm specs
  * <url>http://docs.oracle.com/javase/specs/jvms/se5.0/html/ClassFile.doc.html</url>
  * 下面的所有注释都来自上面的jvm规范
- *
+ * <p/>
  * CONSTANT_InvokeDynamic CONSTANT_MethodHandle CONSTANT_MethodType 常量解析除外
  */
 public class ConstantPoolParse {
@@ -38,6 +41,13 @@ public class ConstantPoolParse {
     public ConstantPoolParse(String code) {
         this.code = code;
     }
+
+    /**
+     * 存放所有常量池的信息.
+     * 暂时只放了utf8 ,integer float double long 等基本类型数据
+     * 因为后面的属性表中需要用到.just for study
+     */
+    public static final Map<Integer, String> constantPoolMap = new HashMap<Integer, String>();
 
 
     public ParseResult pareContantPool() throws Exception {
@@ -65,6 +75,8 @@ public class ConstantPoolParse {
                     strs[idx] = "#" + idx + " = Utf8" + BLANK + constant_type_utf8.getValue();
                     //加上偏移量
                     hand += constant_type_utf8.getOffset() * TWO;
+                    //放入到constantPoolMap中.
+                    constantPoolMap.put(idx, Util.toStringHex(bytes_utf8.getValue()));
                     break;
                 //如果是Constant_Type_Integer类型
                 case CONSTANT_Integer:
@@ -72,47 +84,55 @@ public class ConstantPoolParse {
                     int bytes_start = hand + tag_length;
                     //byte的结束位置.bytes占4位
                     int bytes_end = bytes_start + 4 * TWO;
-                    Type bytes_integer = new Type(code.substring(bytes_start,bytes_end));
+                    Type bytes_integer = new Type(code.substring(bytes_start, bytes_end));
                     Constant_Type constant_type_integer = new Constant_Type_Integer(bytes_integer);
                     strs[idx] = "#" + idx + " = Integer " + BLANK + constant_type_integer.getValue();
                     hand += constant_type_integer.getOffset() * TWO;
+                    //放入到constantPoolMap中.
+                    constantPoolMap.put(idx, bytes_integer.getDecimalInteger() + "");
                     break;
                 case CONSTANT_Float:
                     //bytes的开始位置,hand 加tag位
                     bytes_start = hand + tag_length;
                     //byte的结束位置.bytes占4位
                     bytes_end = bytes_start + 4 * TWO;
-                    Type bytes_float = new Type(code.substring(bytes_start,bytes_end));
+                    Type bytes_float = new Type(code.substring(bytes_start, bytes_end));
                     Constant_Type constant_type_float = new Constant_Type_Float(bytes_float);
                     strs[idx] = "#" + idx + " = Float " + BLANK + constant_type_float.getValue();
                     hand += constant_type_float.getOffset() * TWO;
+                    //放入到constantPoolMap中.
+                    constantPoolMap.put(idx, bytes_float.getDecimalFloat() + "f");
                     break;
                 case CONSTANT_Long:
                     //bytes的开始位置,hand 加tag位
                     bytes_start = hand + tag_length;
                     //byte的结束位置.bytes占8位
                     bytes_end = bytes_start + 8 * TWO;
-                    Type bytes_long = new Type(code.substring(bytes_start,bytes_end));
+                    Type bytes_long = new Type(code.substring(bytes_start, bytes_end));
                     Constant_Type constant_type_long = new Constant_Type_Long(bytes_long);
                     strs[idx] = "#" + idx + " = Float " + BLANK + constant_type_long.getValue();
                     hand += constant_type_long.getOffset() * TWO;
+                    //放入到constantPoolMap中.
+                    constantPoolMap.put(idx, bytes_long.getDecimalLong() + "l");
                     break;
                 case CONSTANT_Double:
                     //bytes的开始位置,hand 加tag位
                     bytes_start = hand + tag_length;
                     //byte的结束位置.bytes占8位
                     bytes_end = bytes_start + 8 * TWO;
-                    Type bytes_double = new Type(code.substring(bytes_start,bytes_end));
+                    Type bytes_double = new Type(code.substring(bytes_start, bytes_end));
                     Constant_Type constant_type_double = new Constant_Type_Double(bytes_double);
                     strs[idx] = "#" + idx + " = Float " + BLANK + constant_type_double.getValue();
                     hand += constant_type_double.getOffset() * TWO;
+                    //放入到constantPoolMap中.
+                    constantPoolMap.put(idx, bytes_double.getDecimalDouble() + "d");
                     break;
                 case CONSTANT_Class:
                     //index开始的位置
                     int index_start = hand + tag_length;
                     //index占用两字节
                     int index_end = index_start + 2 * TWO;
-                    Type index_class = new Type(code.substring(index_start,index_end));
+                    Type index_class = new Type(code.substring(index_start, index_end));
                     Constant_Type constant_type_class = new Constant_Type_Class(index_class);
                     strs[idx] = "#" + idx + " = class " + BLANK + constant_type_class.getValue();
                     hand += constant_type_class.getOffset() * TWO;
@@ -122,7 +142,7 @@ public class ConstantPoolParse {
                     index_start = hand + tag_length;
                     //index占用两字节
                     index_end = index_start + 2 * TWO;
-                    Type index_string = new Type(code.substring(index_start,index_end));
+                    Type index_string = new Type(code.substring(index_start, index_end));
                     Constant_Type constant_type_string = new Constant_Type_String(index_string);
                     strs[idx] = "#" + idx + " = string " + BLANK + constant_type_string.getValue();
                     hand += constant_type_string.getOffset() * TWO;
@@ -130,30 +150,30 @@ public class ConstantPoolParse {
                 case CONSTANT_Fieldref:
                     int class_index_start = hand + tag_length;
                     int class_index_end = class_index_start + 2 * TWO;
-                    int name_index_end = class_index_end + 2 *TWO;
-                    Type class_index = new Type(code.substring(class_index_start,class_index_end));
-                    Type name_index = new Type(code.substring(class_index_end,name_index_end));
-                    Constant_Type constant_type_fieldref = new Constant_Type_Fieldref(class_index,name_index);
+                    int name_index_end = class_index_end + 2 * TWO;
+                    Type class_index = new Type(code.substring(class_index_start, class_index_end));
+                    Type name_index = new Type(code.substring(class_index_end, name_index_end));
+                    Constant_Type constant_type_fieldref = new Constant_Type_Fieldref(class_index, name_index);
                     strs[idx] = "#" + idx + " = fieldref " + BLANK + constant_type_fieldref.getValue();
                     hand += constant_type_fieldref.getOffset() * TWO;
                     break;
                 case CONSTANT_Methodref:
                     class_index_start = hand + tag_length;
                     class_index_end = class_index_start + 2 * TWO;
-                    name_index_end = class_index_end + 2 *TWO;
-                    class_index = new Type(code.substring(class_index_start,class_index_end));
-                    name_index = new Type(code.substring(class_index_end,name_index_end));
-                    Constant_Type constant_type_methodref = new Constant_Type_Methodref(class_index,name_index);
+                    name_index_end = class_index_end + 2 * TWO;
+                    class_index = new Type(code.substring(class_index_start, class_index_end));
+                    name_index = new Type(code.substring(class_index_end, name_index_end));
+                    Constant_Type constant_type_methodref = new Constant_Type_Methodref(class_index, name_index);
                     strs[idx] = "#" + idx + " = methodref " + BLANK + constant_type_methodref.getValue();
                     hand += constant_type_methodref.getOffset() * TWO;
                     break;
                 case CONSTANT_InterfaceMethodref:
                     class_index_start = hand + tag_length;
                     class_index_end = class_index_start + 2 * TWO;
-                    name_index_end = class_index_end + 2 *TWO;
-                    class_index = new Type(code.substring(class_index_start,class_index_end));
-                    name_index = new Type(code.substring(class_index_end,name_index_end));
-                    Constant_Type constant_type_interfacemethodref = new Constant_Type_InterfaceMethodref(class_index,name_index);
+                    name_index_end = class_index_end + 2 * TWO;
+                    class_index = new Type(code.substring(class_index_start, class_index_end));
+                    name_index = new Type(code.substring(class_index_end, name_index_end));
+                    Constant_Type constant_type_interfacemethodref = new Constant_Type_InterfaceMethodref(class_index, name_index);
                     strs[idx] = "#" + idx + " = interfacemethodref " + BLANK + constant_type_interfacemethodref.getValue();
                     hand += constant_type_interfacemethodref.getOffset() * TWO;
                     break;
@@ -161,10 +181,10 @@ public class ConstantPoolParse {
                 case CONSTANT_NameAndType:
                     class_index_start = hand + tag_length;
                     class_index_end = class_index_start + 2 * TWO;
-                    int desc_index_end = class_index_end + 2 *TWO;
-                    class_index = new Type(code.substring(class_index_start,class_index_end));
-                    Type desc_index = new Type(code.substring(class_index_end,desc_index_end));
-                    Constant_Type constant_type_nameandtype = new Constant_Type_NameAndType(class_index,desc_index);
+                    int desc_index_end = class_index_end + 2 * TWO;
+                    class_index = new Type(code.substring(class_index_start, class_index_end));
+                    Type desc_index = new Type(code.substring(class_index_end, desc_index_end));
+                    Constant_Type constant_type_nameandtype = new Constant_Type_NameAndType(class_index, desc_index);
                     strs[idx] = "#" + idx + " = nameandtype " + BLANK + constant_type_nameandtype.getValue();
                     hand += constant_type_nameandtype.getOffset() * TWO;
                     break;
@@ -198,6 +218,7 @@ public class ConstantPoolParse {
 
         /**
          * 获取tag位数值
+         *
          * @return
          */
         public abstract int getTag();
@@ -211,7 +232,7 @@ public class ConstantPoolParse {
         Type length;
         //字符串信息
         Type bytes;
-        
+
         Constant_Type_Utf8(Type length, Type bytes) {
             this.length = length;
             this.bytes = bytes;
@@ -246,7 +267,6 @@ public class ConstantPoolParse {
 
     /**
      * 常量池数据类型之  Integer类型
-     *
      */
     class Constant_Type_Integer extends Constant_Type {
 
@@ -276,7 +296,6 @@ public class ConstantPoolParse {
 
     /**
      * 常量池数据类型之  Float类型
-     *
      */
     class Constant_Type_Float extends Constant_Type {
 
@@ -306,7 +325,6 @@ public class ConstantPoolParse {
 
     /**
      * 常量池数据类型之  Long类型
-     *
      */
     class Constant_Type_Long extends Constant_Type {
 
@@ -336,7 +354,6 @@ public class ConstantPoolParse {
 
     /**
      * 常量池数据类型之  Double类型
-     *
      */
     class Constant_Type_Double extends Constant_Type {
 
@@ -364,7 +381,7 @@ public class ConstantPoolParse {
         }
     }
 
-    class Constant_Type_Class extends Constant_Type{
+    class Constant_Type_Class extends Constant_Type {
 
         Constant_Type_Class(Type index) {
             this.index = index;
@@ -390,7 +407,7 @@ public class ConstantPoolParse {
         }
     }
 
-    class Constant_Type_String extends Constant_Type{
+    class Constant_Type_String extends Constant_Type {
 
         Constant_Type_String(Type index) {
             this.index = index;
@@ -416,7 +433,7 @@ public class ConstantPoolParse {
         }
     }
 
-    class Constant_Type_Fieldref extends Constant_Type{
+    class Constant_Type_Fieldref extends Constant_Type {
 
         Constant_Type_Fieldref(Type class_index, Type name_index) {
             this.class_index = class_index;
@@ -431,7 +448,7 @@ public class ConstantPoolParse {
 
         @Override
         public String getValue() throws Exception {
-            return "class_index:#" + class_index.getDecimalInteger() + ",name_index:#"+name_index.getDecimalInteger();
+            return "class_index:#" + class_index.getDecimalInteger() + ",name_index:#" + name_index.getDecimalInteger();
         }
 
         @Override
@@ -446,7 +463,7 @@ public class ConstantPoolParse {
         }
     }
 
-    class Constant_Type_Methodref extends Constant_Type{
+    class Constant_Type_Methodref extends Constant_Type {
 
         Constant_Type_Methodref(Type class_index, Type name_index) {
             this.class_index = class_index;
@@ -461,7 +478,7 @@ public class ConstantPoolParse {
 
         @Override
         public String getValue() throws Exception {
-            return "class_index:#" + class_index.getDecimalInteger() + ",name_index:#"+name_index.getDecimalInteger();
+            return "class_index:#" + class_index.getDecimalInteger() + ",name_index:#" + name_index.getDecimalInteger();
         }
 
         @Override
@@ -476,7 +493,7 @@ public class ConstantPoolParse {
         }
     }
 
-    class Constant_Type_InterfaceMethodref extends Constant_Type{
+    class Constant_Type_InterfaceMethodref extends Constant_Type {
 
         Constant_Type_InterfaceMethodref(Type class_index, Type name_index) {
             this.class_index = class_index;
@@ -491,7 +508,7 @@ public class ConstantPoolParse {
 
         @Override
         public String getValue() throws Exception {
-            return "class_index:#" + class_index.getDecimalInteger() + ",name_index:#"+name_index.getDecimalInteger();
+            return "class_index:#" + class_index.getDecimalInteger() + ",name_index:#" + name_index.getDecimalInteger();
         }
 
         @Override
@@ -506,7 +523,7 @@ public class ConstantPoolParse {
         }
     }
 
-    class Constant_Type_NameAndType extends Constant_Type{
+    class Constant_Type_NameAndType extends Constant_Type {
 
         Constant_Type_NameAndType(Type desc_index, Type name_index) {
             this.desc_index = desc_index;
@@ -520,7 +537,7 @@ public class ConstantPoolParse {
 
         @Override
         public String getValue() throws Exception {
-            return "name_index:#"+name_index.getDecimalInteger() + ",desc_index:#"+ desc_index.getDecimalInteger();
+            return "name_index:#" + name_index.getDecimalInteger() + ",desc_index:#" + desc_index.getDecimalInteger();
         }
 
         @Override
