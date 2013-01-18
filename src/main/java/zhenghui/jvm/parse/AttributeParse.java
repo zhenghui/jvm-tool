@@ -84,6 +84,59 @@ public class AttributeParse {
     }
 
     /**
+     * 解析方法中的属性表.暂时没有解析指令.后面有时间补上.
+     * 方法中解析的属性有Code,Deprecated,Exceptions Synthetic
+     * @param hand
+     * @return
+     */
+    public ParseResult parseMethodAttribute(int hand){
+        ParseResult result = new ParseResult();
+        //attribute_count占用两个字节
+        int attribute_count_end = hand + 2 * TWO;
+        Type attribute_count = new Type(code.substring(hand, attribute_count_end));
+        ParseResult[] results = null;
+        int current = attribute_count_end;
+        if (attribute_count.getDecimalInteger() > 0) {
+            results = new ParseResult[attribute_count.getDecimalInteger()];
+            for (int i = 0; i < attribute_count.getDecimalInteger(); i++) {
+                //attribute_name占用两个字节,指向常量池的索引.需要获取这个常量的值.
+                Type attribute_name = new Type(code.substring(current, current + 2 * TWO));
+                String name = ConstantPoolParse.constantPoolMap.get(attribute_name.getDecimalInteger());
+                ParseResult pr = null;
+                switch (name) {
+                    case ATTRIBUTE_CONSTANT_VALUE:
+                        pr = readConstantValue(current);
+                        break;
+                    case ATTRIBUTE_DEPRECATED:
+                        pr = readDeprecated(current);
+                        break;
+                    default:
+                        //如果无法解析某一个属性
+                        pr = readUnknowAttr(current);
+                        break;
+                }
+                results[i] = pr;
+                current = pr.getHandle();
+            }
+        }
+        return result;
+    }
+
+    private ParseResult readCode(int hand){
+        ParseResult result = new ParseResult();
+        int atrribute_name_inidex_end = hand + 2 * TWO;
+        Type attribute_name_index = new Type(code.substring(hand, atrribute_name_inidex_end));
+        //attribute_length 占用4个字节
+        int attribute_length_end = atrribute_name_inidex_end + 4 * TWO;
+        Type attribute_length = new Type(code.substring(atrribute_name_inidex_end, attribute_length_end));
+
+
+
+        result.setHandle(attribute_length_end + attribute_length.getDecimalInteger());
+        return result;
+    }
+
+    /**
      * 解析 Deprecated属性
      *
      * @param hand

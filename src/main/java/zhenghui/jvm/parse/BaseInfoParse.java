@@ -149,7 +149,7 @@ public class BaseInfoParse {
                 current = attributeResult.getHandle();
             }
         }
-        if(strs == null || strs.length<= 0){
+        if (strs == null || strs.length <= 0) {
             strs = new String[1];
             strs[0] = "this class has no field";
         }
@@ -167,11 +167,21 @@ public class BaseInfoParse {
     public ParseResult parseMethodInfo(int hand) {
         ParseResult result = new ParseResult();
         int method_count_end = hand + 2 * TWO;
-        Type method_count = new Type(code.substring(hand,method_count_end));
+        Type method_count = new Type(code.substring(hand, method_count_end));
         List<String> strList = new ArrayList<>();
         int current = method_count_end;
-        if(method_count.getDecimalInteger() > 0){
-
+        if (method_count.getDecimalInteger() > 0) {
+            for (int i = 0; i < method_count.getDecimalInteger(); i++) {
+                //access_flag 占用两个字节
+                int access_flag_end = current + 2 * TWO;
+                Type access_flag = new Type(code.substring(current,access_flag_end));
+                int name_index_end = access_flag_end + 2 * TWO;
+                Type name_index = new Type(code.substring(access_flag_end,name_index_end));
+                int descriptor_index_end = name_index_end + 2* TWO;
+                Type descriptor_index = new Type(code.substring(name_index_end,descriptor_index_end));
+                //access_flag name_index descriptor_index各占两个字节,向下移动6个字节
+                current = current + (2 + 2 + 2) * TWO;
+            }
         } else {
             strList.add("this class has no method");
         }
