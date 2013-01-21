@@ -196,6 +196,16 @@ public class BaseInfoParse {
     }
 
     /**
+     * 解析class级别的属性
+     *
+     * @param hand
+     * @return
+     */
+    public ParseResult parseAttribute(int hand){
+        return attributeParse.parseAttribute(hand);
+    }
+
+    /**
      * 解析对应的修饰位.包含class的,field的 和 method的
      *
      * @param access_flag

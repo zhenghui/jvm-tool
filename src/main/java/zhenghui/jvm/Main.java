@@ -49,6 +49,11 @@ public class Main {
         for(String str : result.getStrs()){
             System.out.println(str);
         }
+        System.out.println("------attributes info----------");
+        result = baseInfoParse.parseAttribute(result.getHandle());
+        for(String str : result.getStrs()){
+            System.out.println(str);
+        }
         System.out.println(result.getHandle()/2);
     }
 }

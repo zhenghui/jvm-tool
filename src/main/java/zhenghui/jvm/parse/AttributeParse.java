@@ -25,6 +25,7 @@ public class AttributeParse {
     private static final String ATTRIBUTE_LINE_NUMBER_TABLE = "LineNumberTable";// code_attribute
     private static final String ATTRIBUTE_LOCAL_VARIALBLE_TABLE = "LocalVariableTable";//code_attribute
     private static final String ATTRIBUTE_CODE = "Code";//method_info
+    private static final String ATTRIBUTE_SOURCE_FILE = "SourceFile"; //class info
 
     public AttributeParse(String code) {
         this.code = code;
@@ -90,7 +91,7 @@ public class AttributeParse {
 
     /**
      * 解析方法中的属性表.暂时没有解析指令.后面有时间补上.
-     * 方法中解析的属性有Code,Deprecated,Exceptions Synthetic
+     * 方法中解析的属性有Code,Deprecated,Exceptions
      *
      * @param hand
      * @return
@@ -124,6 +125,56 @@ public class AttributeParse {
             }
         }
         result.setHandle(current);
+        return result;
+    }
+
+    /**
+     * 解析class级别的属性
+     *
+     * @param hand
+     * @return
+     */
+    public ParseResult parseAttribute(int hand) {
+        ParseResult result = new ParseResult();
+        int attribute_count_end = hand + 2 * TWO;
+        Type attribute_count = new Type(code.substring(hand, attribute_count_end));
+        int current = attribute_count_end;
+        if (attribute_count.getDecimalInteger() > 0) {
+            for (int i = 0; i < attribute_count.getDecimalInteger(); i++) {
+                int attribute_name_index_end = current + 2 * TWO;
+                Type attribute_name = new Type(code.substring(current, attribute_name_index_end));
+                String name = ConstantPoolParse.constantPoolMap.get(attribute_name.getDecimalInteger());
+                ParseResult pr;
+                switch (name) {
+                    case ATTRIBUTE_SOURCE_FILE:
+                        pr = parseSourceFile(current);
+                        break;
+                    default:
+                        pr = readUnknowAttr(current);
+                        break;
+                }
+                current = pr.getHandle();
+                result.addStrs(pr.getStrs());
+            }
+        } else {
+            result.addStr("this class has no attribute");
+        }
+        result.setHandle(current);
+
+        return result;
+    }
+
+    private ParseResult parseSourceFile(int hand) {
+        ParseResult result = new ParseResult();
+        int atrribute_name_inidex_end = hand + 2 * TWO;
+        Type attribute_name_index = new Type(code.substring(hand, atrribute_name_inidex_end));
+        //attribute_length 占用4个字节
+        int attribute_length_end = atrribute_name_inidex_end + 4 * TWO;
+        Type attribute_length = new Type(code.substring(atrribute_name_inidex_end, attribute_length_end));
+        int sourcefile_index_end = attribute_length_end + 2 * TWO;
+        Type sourcefile_index = new Type(code.substring(attribute_length_end, sourcefile_index_end));
+        result.addStr(ConstantPoolParse.constantPoolMap.get(attribute_name_index.getDecimalInteger()) + ":" + ConstantPoolParse.constantPoolMap.get(sourcefile_index.getDecimalInteger()));
+        result.setHandle(attribute_length_end + attribute_length.getDecimalInteger() * TWO);
         return result;
     }
 
