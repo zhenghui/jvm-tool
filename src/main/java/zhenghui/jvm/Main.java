@@ -21,26 +21,31 @@ public class Main {
         for(String str : baseInfoParse.parseBaseInfo()){
             System.out.println(str);
         }
-        System.out.println("constant pool start");
+        System.out.println("------------constant pool start-------------");
         //常量池
         ConstantPoolParse constantPoolParse = new ConstantPoolParse(code);
         ParseResult result = constantPoolParse.pareContantPool();
         for(String str : result.getStrs()){
             System.out.println(str);
         }
-        System.out.println("access_flag");
+        System.out.println("-----------access_flag--------");
         //访问标记
         result = baseInfoParse.parseAccessFlags(result.getHandle());
         for(String str : result.getStrs()){
             System.out.println(str);
         }
-        System.out.println("this_class superc_class interfaces");
+        System.out.println("----------this_class superc_class interfaces--------");
         result = baseInfoParse.parseClassInfo(result.getHandle());
         for(String str : result.getStrs()){
             System.out.println(str);
         }
-        System.out.println("field info ");
+        System.out.println("-------field info -----");
         result = baseInfoParse.parseFieldInfo(result.getHandle());
+        for(String str : result.getStrs()){
+            System.out.println(str);
+        }
+        System.out.println("------method info----------");
+        result = baseInfoParse.parseMethodInfo(result.getHandle());
         for(String str : result.getStrs()){
             System.out.println(str);
         }

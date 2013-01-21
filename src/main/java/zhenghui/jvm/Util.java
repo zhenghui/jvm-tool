@@ -1,5 +1,7 @@
 package zhenghui.jvm;
 
+import java.io.UnsupportedEncodingException;
+
 /**
  * Created by IntelliJ IDEA.
  * User: zhenghui
@@ -16,12 +18,17 @@ public class Util {
      * @return
      * @throws Exception
      */
-    public static String toStringHex(String s) throws Exception {
+    public static String toStringHex(String s) {
         byte[] baKeyword = new byte[s.length() / 2];
         for (int i = 0; i < baKeyword.length; i++) {
             baKeyword[i] = (byte) (0xff & Integer.parseInt(s.substring(i * 2, i * 2 + 2), 16));
         }
-        return new String(baKeyword, "utf-8");
+        try {
+            return new String(baKeyword, "utf-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            return "";
+        }
     }
 
     /**

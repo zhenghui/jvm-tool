@@ -145,7 +145,7 @@ public class BaseInfoParse {
                 strs[2 * i] = "field  access_flag:" + getAccessFlags(access_flag.getDecimalInteger()) + ",name:"
                         + ConstantPoolParse.constantPoolMap.get(name_index.getDecimalInteger()) + ",descriptor:"
                         + ConstantPoolParse.constantPoolMap.get(descriptor_index.getDecimalInteger());
-                strs[(2 * i) + 1] = " atrributes: " + attributeResult.getStrs()[0];
+                strs[(2 * i) + 1] = " atrributes: " + attributeResult.getStrs().get(0);
                 current = attributeResult.getHandle();
             }
         }
@@ -168,25 +168,30 @@ public class BaseInfoParse {
         ParseResult result = new ParseResult();
         int method_count_end = hand + 2 * TWO;
         Type method_count = new Type(code.substring(hand, method_count_end));
-        List<String> strList = new ArrayList<>();
         int current = method_count_end;
         if (method_count.getDecimalInteger() > 0) {
             for (int i = 0; i < method_count.getDecimalInteger(); i++) {
                 //access_flag 占用两个字节
                 int access_flag_end = current + 2 * TWO;
                 Type access_flag = new Type(code.substring(current,access_flag_end));
+                result.addStr("flags:" + getAccessFlags(access_flag.getDecimalInteger()));;
                 int name_index_end = access_flag_end + 2 * TWO;
                 Type name_index = new Type(code.substring(access_flag_end,name_index_end));
+                result.addStr("name:" + ConstantPoolParse.constantPoolMap.get(name_index.getDecimalInteger()));
                 int descriptor_index_end = name_index_end + 2* TWO;
                 Type descriptor_index = new Type(code.substring(name_index_end,descriptor_index_end));
+                result.addStr("descriptor:"+ConstantPoolParse.constantPoolMap.get(descriptor_index.getDecimalInteger()));
                 //access_flag name_index descriptor_index各占两个字节,向下移动6个字节
                 current = current + (2 + 2 + 2) * TWO;
+                ParseResult pr = attributeParse.parseMethodAttribute(current);
+                result.addStrs(pr.getStrs());
+                result.addStr("---------------------");
+                current = pr.getHandle();
             }
         } else {
-            strList.add("this class has no method");
+            result.addStr("this class has no method");
         }
         result.setHandle(current);
-        result.setStrs((String[]) strList.toArray());
         return result;
     }
 
