@@ -9,5 +9,8 @@ jvm-tool
 #2012-01-17
 完成了field_info的解析..不过field的属性值解析了 ConstantValue 和Deprecated.其他的属性都未解析.
 
+#2012-01-21
+基本上完成了所有的解析.不过指令的解析没有做.
+
   
                                add by zhenghui
