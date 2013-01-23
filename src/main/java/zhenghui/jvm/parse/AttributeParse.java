@@ -82,10 +82,10 @@ public class AttributeParse {
                 str += result.getStrs().get(0) + BLANK;
             }
             strs[0] = str;
-            parseResult.setStrs(strs);
         } else {
             strs[0] = "this field has no attribute";
         }
+        parseResult.setStrs(strs);
         return parseResult;
     }
 
