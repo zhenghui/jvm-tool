@@ -149,6 +149,9 @@ public class AttributeParse {
                     case ATTRIBUTE_SOURCE_FILE:
                         pr = parseSourceFile(current);
                         break;
+                    case ATTRIBUTE_DEPRECATED:
+                        pr = readDeprecated(current);
+                        break;
                     default:
                         pr = readUnknowAttr(current);
                         break;

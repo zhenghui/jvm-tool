@@ -270,6 +270,9 @@
             if (Util.hasTag(access_flag, ACC_MODULE)) {
                 flags += " ACC_MODULE,";
             }
+            if(flags.length() == 0){
+                return "";
+            }
             return flags.substring(0, flags.length() - 1);
         }
 

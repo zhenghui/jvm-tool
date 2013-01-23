@@ -15,7 +15,7 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
         ClassLoader cl = new ClassLoader();
-        String code = cl.loadClass("d:\\Test.class");
+        String code = cl.loadClass("D:\\Fooo.class");
         //»ù´¡ÐÅÏ¢
         BaseInfoParse baseInfoParse = new BaseInfoParse(code);
         for(String str : baseInfoParse.parseBaseInfo()){
