@@ -2,7 +2,9 @@
 
     import zhenghui.jvm.Util;
 
+    import java.util.ArrayList;
     import java.util.HashMap;
+    import java.util.List;
     import java.util.Map;
 
     import static zhenghui.jvm.CommonConstant.*;
@@ -53,11 +55,12 @@
         public ParseResult pareContantPool() throws Exception {
             //常量池容量计数器.注意,真实的计数是count-1个.因为这个count包括了计数为0的常量
             Type constant_pool_count = new Type(code.substring(8 * TWO, 10 * TWO));
-            String[] strs = new String[constant_pool_count.getDecimalInteger()];
-            strs[0] = "constant_pool_count :" + constant_pool_count.getDecimalInteger();
+            List<String> strs = new ArrayList<>();
+            strs.add("constant_pool_count :" + constant_pool_count.getDecimalInteger());
             int hand = 10 * TWO;//常量池的第一个常量是从第十个字节开始的(排除第0个常量)
             int tag_length = TWO;//所有的tag位都占用一个字节
-            for (int idx = 1; idx < constant_pool_count.getDecimalInteger(); idx++) {
+            //这里定义id的原因是,long和double类型会占用两个常量池的位置.所以需要特殊处理.
+            for (int idx = 1,id = idx; idx < constant_pool_count.getDecimalInteger(); idx++) {
                 //所有的常量类型都是以tag位开始的.
                 Type tag = new Type(code.substring(hand, hand + tag_length));
                 switch (tag.getDecimalInteger()) {
@@ -72,11 +75,11 @@
                         int bytes_type_end = length_type_end + length.getDecimalInteger() * TWO;
                         Type bytes_utf8 = new Type(code.substring(length_type_end, bytes_type_end));
                         Constant_Type_Utf8 constant_type_utf8 = new Constant_Type_Utf8(length, bytes_utf8);
-                        strs[idx] = "#" + idx + " = Utf8" + BLANK + constant_type_utf8.getValue();
+                        strs.add("#" + id + " = Utf8" + BLANK + constant_type_utf8.getValue());
                         //加上偏移量
                         hand += constant_type_utf8.getOffset() * TWO;
                         //放入到constantPoolMap中.
-                        constantPoolMap.put(idx, Util.toStringHex(bytes_utf8.getValue()));
+                        constantPoolMap.put(id, Util.toStringHex(bytes_utf8.getValue()));
                         break;
                     //如果是Constant_Type_Integer类型
                     case CONSTANT_Integer:
@@ -86,10 +89,10 @@
                         int bytes_end = bytes_start + 4 * TWO;
                         Type bytes_integer = new Type(code.substring(bytes_start, bytes_end));
                         Constant_Type constant_type_integer = new Constant_Type_Integer(bytes_integer);
-                        strs[idx] = "#" + idx + " = Integer " + BLANK + constant_type_integer.getValue();
+                        strs.add("#" + id + " = Integer " + BLANK + constant_type_integer.getValue());
                         hand += constant_type_integer.getOffset() * TWO;
                         //放入到constantPoolMap中.
-                        constantPoolMap.put(idx, bytes_integer.getDecimalInteger() + "");
+                        constantPoolMap.put(id, bytes_integer.getDecimalInteger() + "");
                         break;
                     case CONSTANT_Float:
                         //bytes的开始位置,hand 加tag位
@@ -98,10 +101,10 @@
                         bytes_end = bytes_start + 4 * TWO;
                         Type bytes_float = new Type(code.substring(bytes_start, bytes_end));
                         Constant_Type constant_type_float = new Constant_Type_Float(bytes_float);
-                        strs[idx] = "#" + idx + " = Float " + BLANK + constant_type_float.getValue();
+                        strs.add("#" + id + " = Float " + BLANK + constant_type_float.getValue());
                         hand += constant_type_float.getOffset() * TWO;
                         //放入到constantPoolMap中.
-                        constantPoolMap.put(idx, bytes_float.getDecimalFloat() + "f");
+                        constantPoolMap.put(id, bytes_float.getDecimalFloat() + "f");
                         break;
                     case CONSTANT_Long:
                         //bytes的开始位置,hand 加tag位
@@ -110,10 +113,10 @@
                         bytes_end = bytes_start + 8 * TWO;
                         Type bytes_long = new Type(code.substring(bytes_start, bytes_end));
                         Constant_Type constant_type_long = new Constant_Type_Long(bytes_long);
-                        strs[idx] = "#" + idx + " = Float " + BLANK + constant_type_long.getValue();
+                        strs.add("#" + id++ + " = Long " + BLANK + constant_type_long.getValue());
                         hand += constant_type_long.getOffset() * TWO;
                         //放入到constantPoolMap中.
-                        constantPoolMap.put(idx, bytes_long.getDecimalLong() + "l");
+                        constantPoolMap.put(id, bytes_long.getDecimalLong() + "l");
                         break;
                     case CONSTANT_Double:
                         //bytes的开始位置,hand 加tag位
@@ -122,10 +125,10 @@
                         bytes_end = bytes_start + 8 * TWO;
                         Type bytes_double = new Type(code.substring(bytes_start, bytes_end));
                         Constant_Type constant_type_double = new Constant_Type_Double(bytes_double);
-                        strs[idx] = "#" + idx + " = Float " + BLANK + constant_type_double.getValue();
+                        strs.add("#" + id++ + " = double " + BLANK + constant_type_double.getValue());
                         hand += constant_type_double.getOffset() * TWO;
                         //放入到constantPoolMap中.
-                        constantPoolMap.put(idx, bytes_double.getDecimalDouble() + "d");
+                        constantPoolMap.put(id, bytes_double.getDecimalDouble() + "d");
                         break;
                     case CONSTANT_Class:
                         //index开始的位置
@@ -134,7 +137,7 @@
                         int index_end = index_start + 2 * TWO;
                         Type index_class = new Type(code.substring(index_start, index_end));
                         Constant_Type constant_type_class = new Constant_Type_Class(index_class);
-                        strs[idx] = "#" + idx + " = class " + BLANK + constant_type_class.getValue();
+                        strs.add("#" + id + " = class " + BLANK + constant_type_class.getValue());
                         hand += constant_type_class.getOffset() * TWO;
                         break;
                     case CONSTANT_String:
@@ -144,7 +147,7 @@
                         index_end = index_start + 2 * TWO;
                         Type index_string = new Type(code.substring(index_start, index_end));
                         Constant_Type constant_type_string = new Constant_Type_String(index_string);
-                        strs[idx] = "#" + idx + " = string " + BLANK + constant_type_string.getValue();
+                        strs.add("#" + id + " = string " + BLANK + constant_type_string.getValue());
                         hand += constant_type_string.getOffset() * TWO;
                         break;
                     case CONSTANT_Fieldref:
@@ -154,7 +157,7 @@
                         Type class_index = new Type(code.substring(class_index_start, class_index_end));
                         Type name_index = new Type(code.substring(class_index_end, name_index_end));
                         Constant_Type constant_type_fieldref = new Constant_Type_Fieldref(class_index, name_index);
-                        strs[idx] = "#" + idx + " = fieldref " + BLANK + constant_type_fieldref.getValue();
+                        strs.add("#" + id + " = fieldref " + BLANK + constant_type_fieldref.getValue());
                         hand += constant_type_fieldref.getOffset() * TWO;
                         break;
                     case CONSTANT_Methodref:
@@ -164,7 +167,7 @@
                         class_index = new Type(code.substring(class_index_start, class_index_end));
                         name_index = new Type(code.substring(class_index_end, name_index_end));
                         Constant_Type constant_type_methodref = new Constant_Type_Methodref(class_index, name_index);
-                        strs[idx] = "#" + idx + " = methodref " + BLANK + constant_type_methodref.getValue();
+                        strs.add("#" + id + " = methodref " + BLANK + constant_type_methodref.getValue());
                         hand += constant_type_methodref.getOffset() * TWO;
                         break;
                     case CONSTANT_InterfaceMethodref:
@@ -174,7 +177,7 @@
                         class_index = new Type(code.substring(class_index_start, class_index_end));
                         name_index = new Type(code.substring(class_index_end, name_index_end));
                         Constant_Type constant_type_interfacemethodref = new Constant_Type_InterfaceMethodref(class_index, name_index);
-                        strs[idx] = "#" + idx + " = interfacemethodref " + BLANK + constant_type_interfacemethodref.getValue();
+                        strs.add("#" + id + " = interfacemethodref " + BLANK + constant_type_interfacemethodref.getValue());
                         hand += constant_type_interfacemethodref.getOffset() * TWO;
                         break;
                     //Constant_Type_NameAndType
@@ -185,15 +188,16 @@
                         class_index = new Type(code.substring(class_index_start, class_index_end));
                         Type desc_index = new Type(code.substring(class_index_end, desc_index_end));
                         Constant_Type constant_type_nameandtype = new Constant_Type_NameAndType(class_index, desc_index);
-                        strs[idx] = "#" + idx + " = nameandtype " + BLANK + constant_type_nameandtype.getValue();
+                        strs.add("#" + id + " = nameandtype " + BLANK + constant_type_nameandtype.getValue());
                         hand += constant_type_nameandtype.getOffset() * TWO;
                         break;
                     default:
                         ;
                 }
+                id ++;
             }
             ParseResult result = new ParseResult();
-            result.setStrs(strs);
+            result.addStrs(strs);
             result.setHandle(hand);
             return result;
         }
